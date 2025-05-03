@@ -92,8 +92,43 @@ std::set<std::string> boggle(const std::set<std::string>& dict, const std::set<s
 }
 
 bool boggleHelper(const std::set<std::string>& dict, const std::set<std::string>& prefix, const std::vector<std::vector<char> >& board, 
-								   std::string word, std::set<std::string>& result, unsigned int r, unsigned int c, int dr, int dc)
-{
-//add your solution here!
+								   std::string word, std::set<std::string>& result, unsigned int r, unsigned int c, int dr, int dc){
 
-}
+			if(r<0 || r>=board.size() || c<0 || c>= board[0].size()){
+				return false;
+			}
+
+
+			word.push_back(board[r][c]);
+
+			bool is_prefix = prefix.find(word)!= prefix.end();
+
+			bool is_word = dict.find(word) != dict.end();
+
+			if(!is_prefix){
+				if(is_word){
+
+					result.insert(word);
+					
+				}
+
+				
+				return is_word;
+			}
+
+			bool found_longer_word = boggleHelper(dict,  prefix, board, word, result, r+dr, c+dc, dr, dc);
+
+			if(!found_longer_word && is_word){
+				result.insert(word);
+		
+
+				return true;
+			}
+
+			
+
+			return found_longer_word;
+
+	}
+
+
