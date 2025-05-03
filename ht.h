@@ -37,7 +37,7 @@ struct LinearProber : public Prober<KeyType> {
         // to find the key or an empty slot
         if(this->numProbes_ >= this->m_ ) {
             return this->npos; 
-        }
+        } 
         HASH_INDEX_T loc = (this->start_ + this->numProbes_) % this->m_;
         this->numProbes_++;
         return loc;
@@ -276,7 +276,10 @@ private:
     HASH_INDEX_T mIndex_;  // index to CAPACITIES
 
     // ADD MORE DATA MEMBERS HERE, AS NECESSARY
-
+	
+		double resizeAlpha_;
+		size_t numItems_;
+		size_t numDeleted_;
 };
 
 // ----------------------------------------------------------------------------
@@ -355,6 +358,10 @@ void HashTable<K,V,Prober,Hash,KEqual>::insert(const ItemType& p)
 
 	}
 
+	if(table_[loc] == nullptr){
+		table_[loc] = new HashItem(p);
+		numItems_++;
+	}
 	else if(table_[loc]->deleted){
 
 		delete table_[loc];
@@ -362,6 +369,7 @@ void HashTable<K,V,Prober,Hash,KEqual>::insert(const ItemType& p)
 		numItems_++;
 		numDeleted_ --;
 	}else{
+
 		table_[loc]->item.second = p.second;
 	}
 
@@ -457,6 +465,27 @@ void HashTable<K,V,Prober,Hash,KEqual>::resize()
 	if(mIndex_ + 1>= (sizeof(CAPACITIES)/sizeof(CAPACITIES[0]))){
 
 		throw std::logic_error("Hash table reached maximum size");
+	}
+
+	std::vector<HashItem*> oldTable = table_;
+	HASH_INDEX_T oldSize = CAPACITIES[mIndex_];
+
+	mIndex_++;
+	table_.clear();
+
+	table_.resize(CAPACITIES[mIndex_], nullptr);
+	numItems_ = 0;
+	numDeleted_ = 0;
+
+	for(HASH_INDEX_T i=0; i<oldSize; i++){
+		if(oldTable[i] != nullptr&& !oldTable[i]->deleted){
+
+			insert(oldTable[i]->item);
+		}
+
+		if(oldTable[i]!= nullptr){
+			delete oldTable[i];
+		}
 	}
     
 }
