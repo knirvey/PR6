@@ -20,33 +20,32 @@ struct MyStringHash {
     HASH_INDEX_T operator()(const std::string& k) const
     {
         // Add your code here
-			unsigned long long w[5] = {0, 0, 0, 0, 0};
+			unsigned long long base[5] = {0, 0, 0, 0, 0};
 			int len = k.length();
 
 			for(int i=0; i<len; i++){
 
-				int wIndex = 4-(i/6);
+				int baseIndex = 4-(i/6); //calculate which base elements to use 
 
-				int posInChunk = i%6;
+				int position_chunk = i%6; //pos within chunk of 6 chars
 
 				unsigned long long charValue = letterDigitToNumber(k[len -1 -i]);
 
 				unsigned long long factor = 1;
-
-				for(int j=0; j<posInChunk; j++){
-					factor *= 36;
+				for(int j=0; j<position_chunk; j++){ //for each position
+					factor *= 36; 
 				}
 
-				w[wIndex] += charValue*factor;
+				base[baseIndex] += charValue*factor; //add charValue*factor to base values
 			}
 
-			unsigned long long result =0;
+			unsigned long long hash_value =0;
 
 			for(int i=0; i<5; i++){
-				result += rValues[i]*w[i];
+				hash_value += rValues[i]*base[i];
 			}
 
-			return result;
+			return hash_value;
 
     }
 
@@ -55,13 +54,18 @@ struct MyStringHash {
     {
         // Add code here or delete this helper function if you do not want it
 			if(letter >= 'A' && letter<= 'Z'){
-				letter = letter-'A'+'a';
-			}
 
+				letter = letter-'A'+'a';
+
+			}
 			if(letter >= 'a' && letter<='z'){
-				return letter-'a';
+
+				return letter-'a'; 
+	
 			}else if(letter >= '0'&& letter<='9'){
+
 				return letter - '0' + 26;
+
 			}
 
 			return 0;

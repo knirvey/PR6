@@ -92,42 +92,43 @@ std::set<std::string> boggle(const std::set<std::string>& dict, const std::set<s
 }
 
 bool boggleHelper(const std::set<std::string>& dict, const std::set<std::string>& prefix, const std::vector<std::vector<char> >& board, 
-								   std::string word, std::set<std::string>& result, unsigned int r, unsigned int c, int dr, int dc){
+								   std::string word, std::set<std::string>& result, unsigned int row, unsigned int col, int dirRow, int dirCol){
 
-			if(r<0 || r>=board.size() || c<0 || c>= board[0].size()){
+
+
+			//out of boundary check
+			if(row<0 || row>=board.size() || col<0 || col>= board[0].size()){
 				return false;
 			}
 
 
-			word.push_back(board[r][c]);
+			word.push_back(board[row][col]); //push_back current word to words
+			bool validPrefix = prefix.find(word)!= prefix.end(); //check if current word is a valid prefix in dict
+			bool completeWord = dict.find(word) != dict.end(); //check if current word is complete word in dict
 
-			bool is_prefix = prefix.find(word)!= prefix.end();
+			if(!validPrefix){ //if not valid prefix, nothing to do here
 
-			bool is_word = dict.find(word) != dict.end();
-
-			if(!is_prefix){
-				if(is_word){
+				if(completeWord){ //BUT if it is a completeWord, add it
 
 					result.insert(word);
 					
 				}
 
 				
-				return is_word;
+				return completeWord;
 			}
 
-			bool found_longer_word = boggleHelper(dict,  prefix, board, word, result, r+dr, c+dc, dr, dc);
+			bool longerWordFound = boggleHelper(dict,  prefix, board, word, result, row+dirRow, col+dirCol, dirRow, dirCol);
 
-			if(!found_longer_word && is_word){
+			if(completeWord && !longerWordFound){ //if it is complete word and no longer word found
+			
 				result.insert(word);
-		
-
 				return true;
 			}
 
 			
 
-			return found_longer_word;
+			return longerWordFound;
 
 	}
 
